@@ -6,7 +6,7 @@
 /*   By: yahamdan <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 01:43:09 by yahamdan          #+#    #+#             */
-/*   Updated: 2023/04/13 03:32:44 by yahamdan         ###   ########.fr       */
+/*   Updated: 2023/04/13 03:57:33 by yahamdan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,14 @@ typedef struct philo
 	pthread_t		*philosopher;
 	pthread_mutex_t	*rfork;
 	pthread_mutex_t	*lfork;
-	pthread_mutex_t *mut;
-	pthread_mutex_t *dlock;
+	pthread_mutex_t	*mut;
+	pthread_mutex_t	*dlock;
 	unsigned int	tte;
 	unsigned int	tts;
 	unsigned int	ttd;
 	long long		eat_ti;
 	int				ets;
-}   philo;
+}	t_philo;
 
 int	ft_atoi(char *str);
 

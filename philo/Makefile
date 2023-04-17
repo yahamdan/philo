@@ -6,15 +6,15 @@
 #    By: yahamdan <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/31 01:45:42 by yahamdan          #+#    #+#              #
-#    Updated: 2023/04/13 03:40:45 by yahamdan         ###   ########.fr        #
+#    Updated: 2023/04/14 19:43:06 by yahamdan         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 
 CC = CC
+CFLAGS = -fsanitize=thread -g
 
-# CFLAGS = -fsanitize=thread -g3
  
 SRC = philo.c ft_atoi.c
 
