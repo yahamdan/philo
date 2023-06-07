@@ -6,7 +6,7 @@
 /*   By: yahamdan <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 01:44:10 by yahamdan          #+#    #+#             */
-/*   Updated: 2023/04/15 05:36:56 by yahamdan         ###   ########.fr       */
+/*   Updated: 2023/06/05 11:18:08 by yahamdan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,15 +42,17 @@ void	*routine(void *arg)
 	philosopher = (t_philo *)arg;
 	while (1)
 	{
+		//printf("%d\t r = %p \t l = %p \n", philosopher->id , philosopher->rfork, philosopher->lfork);
 		pthread_mutex_lock(philosopher->lfork);
-		ft_print(philosopher, "has taken a fork");
+		ft_print(philosopher, "has taken a lfork");
 		pthread_mutex_lock(philosopher->rfork);
-		ft_print(philosopher, "has taken a fork");
+		ft_print(philosopher, "has taken a rfork");
 		pthread_mutex_lock(philosopher->dlock);
 		philosopher->eat_ti = new_time();
 		pthread_mutex_unlock(philosopher->dlock);
 		ft_print(philosopher, "is eating");
 		msleep(new_time(), philosopher->tte);
+		ft_print(philosopher, "end eating");
 		pthread_mutex_unlock(philosopher->lfork);
 		pthread_mutex_unlock(philosopher->rfork);
 		ft_print(philosopher, "is sleeping");
@@ -74,7 +76,6 @@ int	main(int ac, char **av)
 	int				num;
 	long long		current_time;
 
-	current_time = new_time();
 	num = ft_atoi(av[1]);
 	philos = malloc(sizeof(t_philo) * num);
 	pthread_mutex_init(&mutex, NULL);
@@ -91,10 +92,11 @@ int	main(int ac, char **av)
 	i = 0;
 	while (i < num)
 	{
-		philos[i].rfork = philos[(1 + i) % num].lfork;
+		philos[i].rfork = philos[(i + 1) % num].lfork;
 		i++;
 	}
 	i = 0;
+	current_time = new_time();
 	while (i < num)
 	{
 		philos[i].ttd = ft_atoi(av[2]);
@@ -108,7 +110,7 @@ int	main(int ac, char **av)
 		philos[i].dlock = &dl;
 		philos[i].eat_ti = new_time();
 		pthread_create(&philos->philosopher[i], NULL, &routine, &philos[i]);
-		usleep(100);
+		usleep(200);
 		i++;
 	}
 	while (1)
