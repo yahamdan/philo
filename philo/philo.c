@@ -6,7 +6,7 @@
 /*   By: yahamdan <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 01:44:10 by yahamdan          #+#    #+#             */
-/*   Updated: 2023/06/05 11:18:08 by yahamdan         ###   ########.fr       */
+/*   Updated: 2023/06/10 12:27:40 by yahamdan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ void	*routine(void *arg)
 	philosopher = (t_philo *)arg;
 	while (1)
 	{
-		//printf("%d\t r = %p \t l = %p \n", philosopher->id , philosopher->rfork, philosopher->lfork);
 		pthread_mutex_lock(philosopher->lfork);
 		ft_print(philosopher, "has taken a lfork");
 		pthread_mutex_lock(philosopher->rfork);
@@ -51,36 +50,27 @@ void	*routine(void *arg)
 		philosopher->eat_ti = new_time();
 		pthread_mutex_unlock(philosopher->dlock);
 		ft_print(philosopher, "is eating");
+		pthread_mutex_lock(philosopher->mut);
+		if (philosopher->ets != 0 && philosopher->ets > 0)
+			philosopher->ets--;
+		pthread_mutex_unlock(philosopher->mut);
 		msleep(new_time(), philosopher->tte);
-		ft_print(philosopher, "end eating");
 		pthread_mutex_unlock(philosopher->lfork);
 		pthread_mutex_unlock(philosopher->rfork);
 		ft_print(philosopher, "is sleeping");
 		msleep(new_time(), philosopher->tts);
 		ft_print(philosopher, "is thinking");
-		pthread_mutex_lock(philosopher->mut);
-		if (philosopher->ets != 0 && philosopher->ets > 0)
-			philosopher->ets--;
-		pthread_mutex_unlock(philosopher->mut);
 	}
 	return (0);
 }
 
-int	main(int ac, char **av)
+t_philo	*pthrdint(int num, char **av)
 {
 	t_philo			*philos;
-	pthread_mutex_t	mutex;
-	pthread_mutex_t	dl;
-	int				i;
-	int				j;
-	int				num;
-	long long		current_time;
+	int	i;
 
-	num = ft_atoi(av[1]);
-	philos = malloc(sizeof(t_philo) * num);
-	pthread_mutex_init(&mutex, NULL);
-	pthread_mutex_init(&dl, NULL);
 	i = 0;
+	philos = malloc(sizeof(t_philo) * num);
 	while (i < num)
 	{
 		philos[i].id = i + 1;
@@ -93,51 +83,85 @@ int	main(int ac, char **av)
 	while (i < num)
 	{
 		philos[i].rfork = philos[(i + 1) % num].lfork;
-		i++;
-	}
-	i = 0;
-	current_time = new_time();
-	while (i < num)
-	{
 		philos[i].ttd = ft_atoi(av[2]);
 		philos[i].tte = ft_atoi(av[3]);
+		i++;
+	}
+	return (philos);
+}
+
+void	create_threads(t_philo *philos, int ac, char **av, int num)
+{
+	long long		current_time;
+	pthread_mutex_t	*mutex;
+	pthread_mutex_t	*dl;
+	int				i;
+
+	mutex = malloc(sizeof(pthread_mutex_t));
+	dl = malloc(sizeof(pthread_mutex_t));
+	pthread_mutex_init(mutex, NULL);
+	pthread_mutex_init(dl, NULL);
+	current_time = new_time();
+	i = 0;
+	while (i < num)
+	{
 		philos[i].tts = ft_atoi(av[4]);
 		philos[i].ets = 0;
 		if (ac == 6)
 			philos[i].ets = ft_atoi(av[5]);
 		philos[i].time = current_time;
-		philos[i].mut = &mutex;
-		philos[i].dlock = &dl;
+		philos[i].mut = mutex;
+		philos[i].dlock = dl;
 		philos[i].eat_ti = new_time();
 		pthread_create(&philos->philosopher[i], NULL, &routine, &philos[i]);
-		usleep(200);
+		usleep(100);
 		i++;
 	}
+}
+
+int	check_deit(t_philo *philos, int ac, int i, int num)
+{
+	int j;
+
+	j = 0;
+	while (i < num)
+	{
+		pthread_mutex_lock(philos[i].dlock);
+		if (new_time() - philos[i].eat_ti >= philos[i].ttd)
+		{
+			pthread_mutex_lock(philos[i].mut);
+			printf("%lld philo %d is died\n", new_time() - philos[i].time, i + 1);
+			return (1);
+		}
+		pthread_mutex_unlock(philos[i].dlock);
+		if (ac == 6)
+		{
+			pthread_mutex_lock(philos[i].mut);
+			if (philos[i].ets == 0)
+				j++;
+			if (j == num)
+				return (1);
+			pthread_mutex_unlock(philos[i].mut);
+		}
+		i++;
+	}
+	return (0);
+}
+
+int	main(int ac, char **av)
+{
+	t_philo			*philos;
+	int				i;
+	int				num;
+
+	num = ft_atoi(av[1]);
+	philos = pthrdint(num, av);
+	create_threads(philos, ac, av, num);
 	while (1)
 	{
 		i = 0;
-		j = 0;
-		while (i < num)
-		{
-			pthread_mutex_lock(philos[i].dlock);
-			if (new_time() - philos[i].eat_ti >= philos[i].ttd)
-			{
-				pthread_mutex_lock(philos[i].mut);
-				printf("%lld philo %d is died\n", new_time() - philos[i].time, i + 1);
-				return (1);
-			}
-			pthread_mutex_unlock(philos[i].dlock);
-			if (ac == 6)
-			{
-				pthread_mutex_lock(philos[i].mut);
-				if (philos[i].ets == 0)
-					j++;
-				if (j == num)
-					return (1);
-				pthread_mutex_unlock(philos[i].mut);
-			}
-			i++;
-		}
+		if (check_deit(philos, ac, i , num))
+			return(1);
 	}
 	return (0);
 }

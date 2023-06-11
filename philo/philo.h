@@ -6,7 +6,7 @@
 /*   By: yahamdan <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 01:43:09 by yahamdan          #+#    #+#             */
-/*   Updated: 2023/04/13 03:57:33 by yahamdan         ###   ########.fr       */
+/*   Updated: 2023/06/10 10:28:35 by yahamdan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct philo
 	pthread_mutex_t	*lfork;
 	pthread_mutex_t	*mut;
 	pthread_mutex_t	*dlock;
+	pthread_mutex_t *locked;
 	unsigned int	tte;
 	unsigned int	tts;
 	unsigned int	ttd;
