@@ -6,7 +6,7 @@
 /*   By: yahamdan <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 01:43:09 by yahamdan          #+#    #+#             */
-/*   Updated: 2023/06/10 10:28:35 by yahamdan         ###   ########.fr       */
+/*   Updated: 2023/06/22 13:09:30 by yahamdan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ typedef struct philo
 	pthread_mutex_t	*lfork;
 	pthread_mutex_t	*mut;
 	pthread_mutex_t	*dlock;
-	pthread_mutex_t *locked;
 	unsigned int	tte;
 	unsigned int	tts;
 	unsigned int	ttd;
@@ -37,6 +36,10 @@ typedef struct philo
 	int				ets;
 }	t_philo;
 
-int	ft_atoi(char *str);
+long long	new_time(void);
+int			ft_atoi(char *str);
+int			char_arg(int ac, char **av);
+void		ft_print(t_philo *p, char *s);
+void		msleep(unsigned long new, unsigned long n);
 
 #endif

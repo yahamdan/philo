@@ -6,34 +6,11 @@
 /*   By: yahamdan <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 01:44:10 by yahamdan          #+#    #+#             */
-/*   Updated: 2023/06/10 12:27:40 by yahamdan         ###   ########.fr       */
+/*   Updated: 2023/06/22 13:07:44 by yahamdan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-long long	new_time(void)
-{
-	long long		t;
-	struct timeval	timv;
-
-	gettimeofday(&timv, NULL);
-	t = timv.tv_sec * 1000 + timv.tv_usec / 1000;
-	return (t);
-}
-
-void	msleep(unsigned long new, unsigned long n)
-{
-	while (new_time() - new < n)
-		usleep(100);
-}
-
-void	ft_print(t_philo *p, char *s)
-{
-	pthread_mutex_lock(p->mut);
-	printf("%lld philo %d %s\n", new_time() - p->time, p->id, s);
-	pthread_mutex_unlock(p->mut);
-}
 
 void	*routine(void *arg)
 {
@@ -66,8 +43,8 @@ void	*routine(void *arg)
 
 t_philo	*pthrdint(int num, char **av)
 {
-	t_philo			*philos;
-	int	i;
+	t_philo	*philos;
+	int		i;
 
 	i = 0;
 	philos = malloc(sizeof(t_philo) * num);
@@ -121,16 +98,17 @@ void	create_threads(t_philo *philos, int ac, char **av, int num)
 
 int	check_deit(t_philo *philos, int ac, int i, int num)
 {
-	int j;
+	int	j;
 
 	j = 0;
-	while (i < num)
+	while (++i < num)
 	{
 		pthread_mutex_lock(philos[i].dlock);
 		if (new_time() - philos[i].eat_ti >= philos[i].ttd)
 		{
 			pthread_mutex_lock(philos[i].mut);
-			printf("%lld philo %d is died\n", new_time() - philos[i].time, i + 1);
+			printf("%lld philo %d is died\n",
+				new_time() - philos[i].time, i + 1);
 			return (1);
 		}
 		pthread_mutex_unlock(philos[i].dlock);
@@ -143,7 +121,6 @@ int	check_deit(t_philo *philos, int ac, int i, int num)
 				return (1);
 			pthread_mutex_unlock(philos[i].mut);
 		}
-		i++;
 	}
 	return (0);
 }
@@ -154,14 +131,16 @@ int	main(int ac, char **av)
 	int				i;
 	int				num;
 
+	if (char_arg(ac, av))
+		return (1);
 	num = ft_atoi(av[1]);
 	philos = pthrdint(num, av);
 	create_threads(philos, ac, av, num);
 	while (1)
 	{
-		i = 0;
-		if (check_deit(philos, ac, i , num))
-			return(1);
+		i = -1;
+		if (check_deit(philos, ac, i, num))
+			return (1);
 	}
 	return (0);
 }
